@@ -1,7 +1,6 @@
 #!/bin/bash
 
 CNRM_VERSION=1.7.0
-REPO_NAME=dashboard-config-connector
 
 if [ "$GOOGLE_CLOUD_PROJECT" == "" ]; then
 	echo "Which is the google cloud project id? "
@@ -9,6 +8,12 @@ if [ "$GOOGLE_CLOUD_PROJECT" == "" ]; then
 fi
 
 gcloud config set project $GOOGLE_CLOUD_PROJECT
+
+# delete existing config connector
+kubectl delete sts,deploy,po,svc,roles,clusterroles,clusterrolebindings --all-namespaces -l cnrm.cloud.google.com/system=true --wait=true
+kubectl delete validatingwebhookconfiguration abandon-on-uninstall.cnrm.cloud.google.com --ignore-not-found --wait=true
+kubectl delete validatingwebhookconfiguration validating-webhook.cnrm.cloud.google.com --ignore-not-found --wait=true
+kubectl delete mutatingwebhookconfiguration mutating-webhook.cnrm.cloud.google.com --ignore-not-found --wait=true
 
 gcloud iam service-accounts create cnrm-system
 
@@ -32,6 +37,6 @@ kubectl wait -n cnrm-system \
  --for=condition=Ready pod --all
 
 # cleanup
-rm -rf ../REPO_NAME
+rm -rf $PWD
 
 exit
