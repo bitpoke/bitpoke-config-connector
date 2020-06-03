@@ -110,6 +110,8 @@ function check_installation() {
 }
 
 function main() {
+    repo=$PWD
+
     set -e
 
     if [ "$GOOGLE_CLOUD_PROJECT" == "" ]; then
@@ -136,6 +138,10 @@ function main() {
 
     # check installation
     check_installation
+
+    # remove the local repo
+    cd ..
+    rm -rf $repo
 }
 
 
