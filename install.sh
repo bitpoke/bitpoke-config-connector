@@ -8,10 +8,10 @@ K8S_REGION=
 
 
 function set_k8s_vars() {
-    local choise="$1"
+    local choice="$1"
     local clusters=(${@:2})
 
-    cl_pair=${clusters[$choise]}
+    cl_pair=${clusters[$choice]}
     cluster=(${cl_pair//:/ })
 
     K8S_CLUSTER=${cluster[0]}
@@ -31,24 +31,24 @@ function get_cluster() {
     fi
 
     count=0
-    echo -e "\nCHOISE    NAME  \tZONE"
+    echo -e "\nCHOICE    NAME  \tZONE"
     for cluster_pair in ${clusters[@]}; do
         cluster=(${cluster_pair//:/ })
         echo -e "$count   ->    ${cluster[0]}  ${cluster[1]}"
         let count++ 1
     done
 
-    choise=0
+    choice=0
 
-    echo -en "\nEnter your choise for cluster [$choise] (${cluster_pair[$choise]}): "
-    read  choise
+    echo -en "\nEnter your choice for cluster [$choice] (${cluster_pair[$choice]}): "
+    read  choice
 
     # check the read value is a number
-    if ! [ -n "$choise" ] || ! [ "$choise" -eq "$choise" ] 2>/dev/null ; then
-        choise=0
+    if ! [ -n "$choice" ] || ! [ "$choice" -eq "$choice" ] 2>/dev/null ; then
+        choice=0
     fi
 
-    set_k8s_vars $choise ${clusters[@]}
+    set_k8s_vars $choice ${clusters[@]}
 }
 
 # uninstall config connector
