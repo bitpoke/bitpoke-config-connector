@@ -1,11 +1,14 @@
 #!/bin/bash
 
-CNRM_VERSION=1.7.2
+set -e
+
+CNRM_VERSION=1.11.1
 CNRM_NAME=cnrm-system
 
 K8S_CLUSTER=
 K8S_REGION=
 
+ROOT_DIR=$pwd
 
 function set_k8s_vars() {
     local choice="$1"
@@ -27,7 +30,9 @@ function get_cluster() {
     clusters=($(echo -e "$raw_clusters" | awk 'FNR > 1 {print $1 ":" $2 }' ))
 
     if [ "${#clusters[@]}" -eq 1 ] ; then
+        echo "Going for the only available cluster: ${#clusters[@]}"
         set_k8s_vars 0 "${clusters[@]}"
+        return
     fi
 
     count=0
@@ -83,22 +88,23 @@ function configure_iam() {
 function install() {
     echo "Install Config Connector ..."
     # temporary directory
-    mkdir tmp
+    mkdir -p tmp
     cd tmp
 
     # download manifests
-    gsutil cp gs://cnrm/$CNRM_VERSION/release-bundle.tar.gz release-bundle.tar.gz
+    wget https://github.com/GoogleCloudPlatform/k8s-config-connector/archive/$CNRM_VERSION.tar.gz -O release-bundle.tar.gz
 
     # extract
-    tar zxvf release-bundle.tar.gz 1>/dev/null
+    tar zxvf release-bundle.tar.gz k8s-config-connector-$CNRM_VERSION/install-bundles/install-bundle-workload-identity/ 1>/dev/null
+    mv k8s-config-connector-$CNRM_VERSION/install-bundles/install-bundle-workload-identity manifests
 
     # Provide your project ID in the controller's installation manifest
-    sed -i.bak "s/\${PROJECT_ID?}/$project_id/" install-bundle-workload-identity/0-cnrm-system.yaml
+    sed -i.bak "s/\${PROJECT_ID?}/$GOOGLE_CLOUD_PROJECT/" manifests/0-cnrm-system.yaml
 
     # apply manifests
-    kubectl apply -f install-bundle-workload-identity/
+    kubectl apply -f manifests/
 
-    # cleanup
+    # cleanup tmp resources
     cd ..
     rm -rf tmp
 }
@@ -109,13 +115,19 @@ function check_installation() {
             --for=condition=Ready pod --all
 }
 
+function cloudshell_cleanup() {
+    # skip if is not ran in cloudshell
+    if  [ "$CLOUD_SHELL" != "true" ]; then
+        return
+    fi
+
+    cd $ROOT_DIR/..
+    rm -rf $ROOT_DIR
+}
+
 function main() {
-    repo=$PWD
-
-    set -e
-
     if [ "$GOOGLE_CLOUD_PROJECT" == "" ]; then
-	      echo "Which is the google cloud project id? "
+	      echo -n "Enter your google cloud project id: "
 	      read GOOGLE_CLOUD_PROJECT
     fi
 
@@ -139,9 +151,7 @@ function main() {
     # check installation
     check_installation
 
-    # remove the local repo
-    cd ..
-    rm -rf $repo
+    cloudshell_cleanup
 }
 
 
