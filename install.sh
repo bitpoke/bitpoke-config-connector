@@ -8,7 +8,7 @@ CNRM_NAME=cnrm-system
 K8S_CLUSTER=
 K8S_REGION=
 
-ROOT_DIR=$pwd
+ROOT_DIR=$PWD
 
 function set_k8s_vars() {
     local choice="$1"
