@@ -26,3 +26,13 @@ In the end you should see a few messages similar to:
 ```
 pod/cnrm-controller-manager-0 condition met
 ```
+
+
+# Uninstall GCP Config Connector
+
+### Run uninstallation script
+
+Just run the following command in the console.
+```bash
+./uninstall.sh
+```
