@@ -2,7 +2,7 @@
 
 set -e
 
-CNRM_VERSION=1.19.1
+CNRM_VERSION=1.27.0
 CNRM_NAME=cnrm-system
 
 K8S_CLUSTER=
