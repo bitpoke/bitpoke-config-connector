@@ -24,7 +24,7 @@ function set_k8s_vars() {
 function get_cluster() {
     echo "Determine cluster ..."
     # list all clusters from current project to the user
-    raw_clusters=$(gcloud container clusters list -q  2>/dev/null)
+    raw_clusters=$(gcloud container clusters list -q)
     echo "$raw_clusters"
 
     clusters=($(echo -e "$raw_clusters" | awk 'FNR > 1 {print $1 ":" $2 }' ))
@@ -49,7 +49,7 @@ function get_cluster() {
     read  choice
 
     # check the read value is a number
-    if ! [ -n "$choice" ] || ! [ "$choice" -eq "$choice" ] 2>/dev/null ; then
+    if ! [ -n "$choice" ] || ! [ "$choice" -eq "$choice" ] ; then
         choice=0
     fi
 
