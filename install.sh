@@ -115,6 +115,21 @@ function check_installation() {
             --for=condition=Ready pod --all
 }
 
+function cloudshell_setup() {
+    if [ "$GOOGLE_CLOUD_PROJECT" == "" ]; then
+          echo -n "Enter your google cloud project id: "
+          read GOOGLE_CLOUD_PROJECT
+    fi
+
+    # set project or make sure that the project is set
+    gcloud config set project $GOOGLE_CLOUD_PROJECT
+
+    # fetch values for K8S_CLUSTER and K8S_REGION
+    get_cluster
+
+    gcloud container clusters get-credentials $K8S_CLUSTER --region $K8S_REGION --project $GOOGLE_CLOUD_PROJECT
+}
+
 function cloudshell_cleanup() {
     # skip if is not ran in cloudshell
     if  [ "$CLOUD_SHELL" != "true" ]; then
@@ -126,18 +141,8 @@ function cloudshell_cleanup() {
 }
 
 function main() {
-    if [ "$GOOGLE_CLOUD_PROJECT" == "" ]; then
-	      echo -n "Enter your google cloud project id: "
-	      read GOOGLE_CLOUD_PROJECT
-    fi
-
-    # set project or make sure that the project is set
-    gcloud config set project $GOOGLE_CLOUD_PROJECT
-
-    # fetch values for K8S_CLUSTER and K8S_REGION
-    get_cluster
-
-    gcloud container clusters get-credentials $K8S_CLUSTER --region $K8S_REGION --project $GOOGLE_CLOUD_PROJECT
+    # setup cloudshell (project, cluster, etc.)
+    cloudshell_setup
 
     # make sure that config connector is not installed
     uninstall

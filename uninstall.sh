@@ -4,9 +4,9 @@ set -e
 
 function main() {
     source install.sh --source-only
-    
-    uninstall
 
+    cloudshell_setup
+    uninstall
     cloudshell_cleanup
 }
 
