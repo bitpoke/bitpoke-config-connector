@@ -43,15 +43,12 @@ function get_cluster() {
         let count++ 1
     done
 
-    choice=0
+    while ! [ -n "$choice" ] || ! [ "$choice" -eq "$choice" ] || [ "$choice" -ge "$count" ] || [ "$choice" -lt "0" ]; do
 
-    echo -en "\nEnter your choice for cluster [$choice] (${cluster_pair[$choice]}): "
-    read  choice
-
-    # check the read value is a number
-    if ! [ -n "$choice" ] || ! [ "$choice" -eq "$choice" ] ; then
         choice=0
-    fi
+        echo -en "\nEnter your choice for cluster [$choice] (${cluster_pair[$choice]}): ";
+        read  choice;
+    done
 
     set_k8s_vars $choice ${clusters[@]}
 }
